@@ -32,7 +32,7 @@ Target version of iOS
 Xcode version
 
 
-# How to report a bug for the web service application:
+## How to report a bug for the web service application:
 Bugs include any problems in the master branch that produce unexpected behavior. Before submitting a bug report, please do a quick search through the Github Issues to see if the bug has already been reported.
 
 Please include the following in all bug reports:
