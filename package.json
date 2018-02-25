@@ -1,0 +1,9 @@
+{
+  "dependencies": {
+    "ethjs-abi": "^0.2.1",
+    "express": "^4.16.2",
+    "qtumjs": "^1.7.3",
+    "qtumjs-wallet": "^0.0.2",
+    "body-parser": "^1.18.2"
+  }
+}
