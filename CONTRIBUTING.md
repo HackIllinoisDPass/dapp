@@ -63,7 +63,7 @@ Before submitting a new feature request, please do a quick search on the issue b
 	* Would it be a breaking change?
 
 ## Recognition model
-All contributors will be listed in the contributors document within this repository.
+All contributors will be listed in the [contributors](https://github.com/HackIllinoisDPass/dapp/blob/master/CONTRIBUTORS.md) document within this repository.
 
 ## Where can I ask for help?
 Feel free to reach out to us via email and we will get back to you as soon as possible. You may also raise a general issue on the issue board and we will get back to you as soon as possible.
