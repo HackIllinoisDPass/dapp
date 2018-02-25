@@ -12,4 +12,4 @@ We hope to receive valuable feedback of QPass as we strive to make it more secur
 
 To contribute to the web service or smart contract, contribute to this repository. To contribute to the mobile application, contribute to [this](https://github.com/HackIllinoisDPass/iOS) repository.
 
-Please see the [CONTRIBUTORS]() guide before contributing.
+Please see the [CONTRIBUTORS](https://github.com/HackIllinoisDPass/dapp/blob/master/CONTRIBUTORS.md) guide before contributing.
