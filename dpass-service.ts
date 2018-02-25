@@ -10,7 +10,6 @@ var jsonParser = bodyParser.json()
 
 
 const sourceWallets = [
-  "cNDZpYwYt6YS7bbdZ4ngqzo1rP4PmWN5ZDRbtC4MwSrDWnDgBPZz",
   "cQDNBwu7P4BKGJX2wnXHg3k9eTMNQk4DsnVrHFpUNaXL6u88akVA",
   "cSfxuNsSG6FnqiqhUUJpUGhfPXfJiX2bbpoGGVbiVzcZRvh1F9Vm",
   "cSgvrs8t1McFYhzFRWQafmsY6hzqRdR9hZjWXgfMkXrGa81Fdgvg",
@@ -24,8 +23,8 @@ const sourceWallets = [
 var events = []
 
 const repoData = require("./solar.development.json");
-const qtum = new qtumjs.Qtum("http://qtum:test@91967c2c.ngrok.io", repoData);
-const rpc = new qtumjs.QtumRPC("http://qtum:test@91967c2c.ngrok.io")
+const qtum = new qtumjs.Qtum("http://qtum:test@localhost:3889", repoData);
+const rpc = new qtumjs.QtumRPC("http://qtum:test@localhost:3889")
 // rpc.rawCall("importprivkey", ["cQDNBwu7P4BKGJX2wnXHg3k9eTMNQk4DsnVrHFpUNaXL6u88akVA", "cQDNBwu7P4BKGJX2wnXHg3k9eTMNQk4DsnVrHFpUNaXL6u88akVA", false]).then(() =>{
 //   console.log("import completed");
 // });
@@ -37,11 +36,12 @@ const myToken = qtum.contract("Locationv2");
 myToken.onLog((entry) => {
     console.log(entry.event);
     events.push(entry.event);
-}, { minconf: 1, fromBlock:92919 });
+}, { minconf: 1, fromBlock:93177 });
 
 app.get('/createwallet', (req, res) => {
   res.statusCode = 200;
   createWallet().then((result) => {
+    console.log(result)
     res.send(result)
   })
 })
@@ -67,7 +67,7 @@ app.get('/getevents', (req, res) => {
   var sender = req.query.sender == "true";
   console.log("address " + address + " sender " + sender);
   filterEvents(address, sender).then((result) => {
-    var jsonString = JSON.stringify(result);
+    var jsonString = JSON.stringify({events: result});
     console.log(jsonString);
     res.send(jsonString);
   })
@@ -76,6 +76,7 @@ app.get('/getevents', (req, res) => {
 app.post('/fillcontract', jsonParser, (req, res) => {
   var sender = req.body.sender;
   var params = {signer: req.body.signer, location: req.body.location, time: req.body.time, encData: req.body.encData}
+  console.log(req.body)
 
   var publicSender;
   res.sendStatus(200)
@@ -94,12 +95,12 @@ async function createWallet() {
   const password = "covfefe"
 
   const wallet = await network.fromMnemonic(mnemonic, password)
-  let tx = await fundWallet(wallet, 0.1)
+  let tx = await fundWallet(wallet, 1)
   console.log(tx)
 
   let privatekey = await wallet.toWIF()
 
-  return {"public": wallet.address, "private": privatekey}
+  return {"publicKey": wallet.address, "privateKey": privatekey}
 }
 
 async function getUserWalletInfo(privatekey){
@@ -112,14 +113,17 @@ async function getUserWalletInfo(privatekey){
 async function getSourceWallet(){
   let privatekey
   let sourceWallet
-  let balance
+  let balance = 0
 
   let i = 0
   do{
     privatekey = sourceWallets[i++]
     sourceWallet = await network.fromWIF(privatekey)
+    if(sourceWallet === undefined){
+      continue
+    }
     balance = (await sourceWallet.getInfo())[0].amount
-  } while(balance < 0.15)
+  } while(balance < 0.15 && i <= sourceWallets.length)
   
   return sourceWallet
 }
@@ -154,7 +158,8 @@ async function sendAfterImport(sender, params){
 }
 
 async function addLocation(sender, props){
-  const tx = await myToken.send("addLocation", [props.signer, props.location, props.time, props.encData], {senderAddress: sender});
+  var hashedSigner = await rpc.rawCall("gethexaddress", [props.signer]);
+  const tx = await myToken.send("addLocation", [hashedSigner, props.location, props.time, props.encData], {senderAddress: sender});
 
   console.log("tx:", tx)
 
